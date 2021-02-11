@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mysql      = require('mysql2');
 const ejs        = require('ejs');
 const cors       = require('cors');
+const {inserirComentarios, pegarComentarios} = require('./mongodb')
 
 const app = express();
 
@@ -47,11 +48,26 @@ app.get('/produtos', (requisitar, resposta) => {
 
 });
 
-app.post('/mensagens', (requisitar, resposta) => {
+app.get('/pegar_mensagens', async (requisitar, resposta) =>{
 
-    let post = requisitar.body;
+    const resultado = await pegarComentarios()
+    resposta.send(resultado)
+    
+})
 
-    let nome = post.nome;
+app.post('/mensagens', async (requisitar, resposta) => {
+
+    let post = requisitar.body
+
+    var comentario = {
+        nome : post.nome,
+        email: post.email,
+        mensagem: post.mensagem 
+    }
+    const result = await inserirComentarios (comentario)
+    resposta.send(result)
+})
+    /*let nome = post.nome;
     let email = post.email;
     let mensagem = post.mensagem;
 
@@ -71,9 +87,9 @@ app.get('/pegar_mensagens', (requisitar, resposta) =>{
     let comando = "SELECT nome_cliente, mensagem FROM mensagens JOIN clientes ON clientes.id_cliente = mensagens.id_cliente LIMIT 5;";
     conexao.query(comando,(erro,resultado) =>{
         resposta.send(resultado);
-    })
+     })
 });
-
+*/
 app.listen(porta);
 
 
